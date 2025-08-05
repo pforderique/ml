@@ -10,7 +10,7 @@ from torch import nn
 class CausalSelfAttention(nn.Module):
     """Causal Self-Attention Layer for Transformer Models."""
 
-    def __init__(self, d_model, n_heads, max_seq_len):
+    def __init__(self, d_model: int, n_heads: int, max_seq_len: int):
         super().__init__()
         if d_model % n_heads != 0:
             raise ValueError("d_model must be divisible by n_heads")
@@ -91,10 +91,11 @@ class CausalSelfAttention(nn.Module):
 class TransformerBlock(nn.Module):
     """Transformer Block with Self-Attention and Feed-Forward Network."""
 
-    def __init__(self, d_model, n_heads, ff_hidden_dim, max_seq_len):
+    def __init__(self, d_model: int, n_heads: int, max_seq_len: int):
         super().__init__()
         self.attn = CausalSelfAttention(d_model, n_heads, max_seq_len)
         self.ln1 = nn.LayerNorm(d_model)
+        ff_hidden_dim = 4 * d_model  # Used in the original paper
         self.ff = nn.Sequential(
             nn.Linear(d_model, ff_hidden_dim),
             nn.GELU(),
@@ -106,7 +107,7 @@ class TransformerBlock(nn.Module):
         """forward pass through the transformer block."""
 
         # Original paper uses Post-Norm, but in practice (GPT, LLaMa) Pre-Norm
-        # is often preferred.
+        # is often preferred
         x = x + self.attn(self.ln1(x))
         x = x + self.ff(self.ln2(x))
         return x
